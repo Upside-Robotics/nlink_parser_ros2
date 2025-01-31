@@ -2,6 +2,6 @@
 #define INITSERIAL_H
 #include <serial/serial.h>
 
-bool initSerial(serial::Serial *serial, char *param_file_path);
+bool initSerial(serial::Serial *serial, std::string port, uint32_t baud_rate);
 
 #endif // INITSERIAL_H

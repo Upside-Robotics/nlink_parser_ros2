@@ -31,7 +31,7 @@ int main(int argc, char **argv)
   rclcpp::init(argc, argv);
   // std::cout<<sizeof(argv)<<" dfg " <<argv[1]<<'\n';
   serial::Serial serial;
-  initSerial(&serial, argv[1]);
+  initSerial(&serial, "/dev/ttyUWB", 921600);
   NProtocolExtracter protocol_extraction;
   auto aoaInit = std::make_shared<linktrack::Init>(&protocol_extraction, &serial);
 

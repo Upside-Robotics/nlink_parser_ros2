@@ -9,7 +9,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "tofsense_parser");
   ros::NodeHandle nh;
   serial::Serial serial;
-  initSerial(&serial);
+  initSerial(&serial, "/dev/ttyUWB", 921600);
 
   NProtocolExtracter extracter;
   tofsense::Init init(&extracter, &serial);
