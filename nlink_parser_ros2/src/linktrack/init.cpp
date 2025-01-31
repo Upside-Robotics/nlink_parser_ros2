@@ -23,7 +23,7 @@ namespace linktrack
 
   Init::Init(NProtocolExtracter *protocol_extraction, serial::Serial *serial) : Node("linktrack_ros2")
   {
-    this->declare_parameter("linktrack_publish_interval", 2.);
+    // this->declare_parameter("linktrack_publish_interval", 2.);
     serial_ = serial;
     protocol_extraction_ = protocol_extraction;
     initDataTransmission();
@@ -45,11 +45,11 @@ namespace linktrack
     pub_node_frame3_= create_publisher<nodeframe3>("nlink_linktrack_nodeframe3", qos);
     pub_node_frame5_= create_publisher<nodeframe5>("nlink_linktrack_nodeframe5", qos);
     pub_node_frame6_= create_publisher<nodeframe6>("nlink_linktrack_nodeframe6", qos);
-    std::cout<<"here"<<1000.*this->get_parameter("linktrack_publish_interval").as_double()<<std::endl;
-    int pub_interval = (int)(1000.*(this->get_parameter("linktrack_publish_interval").as_double()));
-    RCLCPP_INFO(this->get_logger(),"Parameter [linktrack_publish_interval] set to [%d] milliseconds",pub_interval);
-    serial_read_timer_ =  this->create_wall_timer(std::chrono::milliseconds(500), std::bind(&Init::serialReadTimer, this));
-    nodeframe_publisher_ =  this->create_wall_timer(std::chrono::milliseconds(pub_interval), std::bind(&Init::nodeFramePublisher, this));
+    // std::cout<<"here"<<1000.*this->get_parameter("linktrack_publish_interval").as_double()<<std::endl;
+    // int pub_interval = (int)(1000.*(this->get_parameter("linktrack_publish_interval").as_double()));
+    // RCLCPP_INFO(this->get_logger(),"Parameter [linktrack_publish_interval] set to [%d] milliseconds",pub_interval);
+    serial_read_timer_ =  this->create_wall_timer(std::chrono::milliseconds(5), std::bind(&Init::serialReadTimer, this));
+    // nodeframe_publisher_ =  this->create_wall_timer(std::chrono::milliseconds(pub_interval), std::bind(&Init::nodeFramePublisher, this));
     RCLCPP_INFO(this->get_logger(),"Initialized linktrack");
   }
 
@@ -108,8 +108,8 @@ namespace linktrack
         ARRAY_ASSIGN(msg_node.dis_arr, node->dis_arr)
         msg_nodes.push_back(msg_node);
       }
-      // pub_anchor_frame0_->publish(g_msg_anchorframe0);
-      buffer_msg_anchorframe0_ = g_msg_anchorframe0;
+      pub_anchor_frame0_->publish(g_msg_anchorframe0);
+      // buffer_msg_anchorframe0_ = g_msg_anchorframe0;
     });
   }
 
@@ -135,8 +135,8 @@ namespace linktrack
       ARRAY_ASSIGN(msg_data.imu_acc_3d, data.imu_acc_3d)
       ARRAY_ASSIGN(msg_data.angle_3d, data.angle_3d)
       ARRAY_ASSIGN(msg_data.quaternion, data.quaternion)
-      // pub_tag_frame0_->publish(msg_data);
-      buffer_msg_tagframe0_ = msg_data;
+      pub_tag_frame0_->publish(msg_data);
+      // buffer_msg_tagframe0_ = msg_data;
     });
   }
 
@@ -163,8 +163,8 @@ namespace linktrack
         msg_node.data.resize(node->data_length);
         memcpy(msg_node.data.data(), node->data, node->data_length);
       }
-      // pub_node_frame0_->publish(msg_data);
-      buffer_msg_nodeframe0_ = msg_data;
+      pub_node_frame0_->publish(msg_data);
+      // buffer_msg_nodeframe0_ = msg_data;
     });
   }
 
@@ -193,8 +193,8 @@ namespace linktrack
         msg_node.role = node->role;
         ARRAY_ASSIGN(msg_node.pos_3d, node->pos_3d)
       }
-      // pub_node_frame1_->publish(msg_data);
-      buffer_msg_nodeframe1_ = msg_data;
+      pub_node_frame1_->publish(msg_data);
+      // buffer_msg_nodeframe1_ = msg_data;
     });
   }
 
@@ -234,8 +234,8 @@ namespace linktrack
         msg_node.fp_rssi = node->fp_rssi;
         msg_node.rx_rssi = node->rx_rssi;
       }
-      // pub_node_frame2_->publish(msg_data);
-      this->buffer_msg_nodeframe2_ = msg_data;
+      pub_node_frame2_->publish(msg_data);
+      // this->buffer_msg_nodeframe2_ = msg_data;
     });
   }
 
@@ -273,8 +273,8 @@ namespace linktrack
         msg_node.fp_rssi = node->fp_rssi;
         msg_node.rx_rssi = node->rx_rssi;
       }
-      // pub_node_frame3_->publish(msg_data);
-      buffer_msg_nodeframe3_ = msg_data;
+      pub_node_frame3_->publish(msg_data);
+      // buffer_msg_nodeframe3_ = msg_data;
     });
   }
 
@@ -312,8 +312,8 @@ namespace linktrack
         msg_node.fp_rssi = node->fp_rssi;
         msg_node.rx_rssi = node->rx_rssi;
       }
-      // pub_node_frame5_->publish(msg_data);
-      buffer_msg_nodeframe5_ = msg_data;
+      pub_node_frame5_->publish(msg_data);
+      // buffer_msg_nodeframe5_ = msg_data;
     });
   }
 
@@ -348,8 +348,8 @@ namespace linktrack
         msg_node.data.resize(node->data_length);
         memcpy(msg_node.data.data(), node->data, node->data_length);
       }
-      // pub_node_frame6_->publish(msg_data);
-      buffer_msg_nodeframe6_ = msg_data;
+      pub_node_frame6_->publish(msg_data);
+      // buffer_msg_nodeframe6_ = msg_data;
     });
   }
 
