@@ -49,8 +49,6 @@ add_library(${nutils}
     src/utils/nutils.cpp
 )
 target_link_libraries(${nutils}
-  serial::serial
-  rclcpp::rclcpp
   yaml-cpp
 )
 
@@ -60,6 +58,7 @@ target_link_libraries(${nutils}
 
 ament_target_dependencies(${nutils}
   "rclcpp"
+  serial
   "nlink_parser_ros2_interfaces"
   "std_msgs"
   "geometry_msgs"
