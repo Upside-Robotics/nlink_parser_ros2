@@ -30,8 +30,15 @@ int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
   // std::cout<<sizeof(argv)<<" dfg " <<argv[1]<<'\n';
+  std::string port = "/dev/ttyUWB";
+  if (argc == 2) {
+    port = std::string(argv[1]);
+    std::cout<< "Opening port: " << port << std::endl;
+  } else {
+    std::cout<< "No port selected, defaulting to: " << port << std::endl;
+  }
   serial::Serial serial;
-  initSerial(&serial, "/dev/ttyUWB", 921600);
+  initSerial(&serial, port, 921600);
   NProtocolExtracter protocol_extraction;
   auto aoaInit = std::make_shared<linktrack::Init>(&protocol_extraction, &serial);
 
