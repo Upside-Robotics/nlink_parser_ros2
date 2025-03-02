@@ -35,9 +35,8 @@ namespace linktrack
   class Init  : public rclcpp::Node 
   {
   public:
-    explicit Init(NProtocolExtracter *protocol_extraction,
-                  serial::Serial *serial);
-  serial::Serial *serial_;
+    explicit Init(NProtocolExtracter *protocol_extraction);
+  serial::Serial serial_;
 
   private:
     NProtocolExtracter* protocol_extraction_;

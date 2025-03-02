@@ -2,6 +2,7 @@
 
 #include "nutils.h"
 #include "protocols.h"
+#include "init_serial.h"
 
 #define ARRAY_ASSIGN(DEST, SRC)                                                \
   for (size_t _CNT = 0; _CNT < sizeof(SRC) / sizeof(SRC[0]); ++_CNT)           \
@@ -21,10 +22,17 @@ namespace linktrack
   nodeframe6 g_msg_nodeframe6;
 
 
-  Init::Init(NProtocolExtracter *protocol_extraction, serial::Serial *serial) : Node("linktrack_ros2")
+  Init::Init(NProtocolExtracter *protocol_extraction) : Node("linktrack_ros2")
   {
-    // this->declare_parameter("linktrack_publish_interval", 2.);
-    serial_ = serial;
+    this->declare_parameter("serial_port", "/dev/ttyACM0");
+    this->declare_parameter("baud_rate", 921600);
+
+    std::string port = get_parameter("serial_port").as_string();
+    uint32_t baud_rate = static_cast<uint32_t>(get_parameter("baud_rate").as_int());
+
+    initSerial(&serial_, port, baud_rate);
+
+    this->declare_parameter("linktrack_publish_interval", 2.);
     protocol_extraction_ = protocol_extraction;
     initDataTransmission();
     initAnchorFrame0(protocol_extraction);
@@ -54,22 +62,22 @@ namespace linktrack
   }
 
   void Init::nodeFramePublisher(){
-    pub_anchor_frame0_->publish(this->buffer_msg_anchorframe0_);
-    pub_tag_frame0_->publish(this->buffer_msg_tagframe0_);
-    pub_node_frame0_->publish(this->buffer_msg_nodeframe0_);
-    pub_node_frame1_->publish(this->buffer_msg_nodeframe1_);
-    pub_node_frame2_->publish(this->buffer_msg_nodeframe2_);
-    pub_node_frame3_->publish(this->buffer_msg_nodeframe3_);
-    pub_node_frame5_->publish(this->buffer_msg_nodeframe5_);
-    pub_node_frame6_->publish(this->buffer_msg_nodeframe6_);
+    // pub_anchor_frame0_->publish(this->buffer_msg_anchorframe0_);
+    // pub_tag_frame0_->publish(this->buffer_msg_tagframe0_);
+    // pub_node_frame0_->publish(this->buffer_msg_nodeframe0_);
+    // pub_node_frame1_->publish(this->buffer_msg_nodeframe1_);
+    // pub_node_frame2_->publish(this->buffer_msg_nodeframe2_);
+    // pub_node_frame3_->publish(this->buffer_msg_nodeframe3_);
+    // pub_node_frame5_->publish(this->buffer_msg_nodeframe5_);
+    // pub_node_frame6_->publish(this->buffer_msg_nodeframe6_);
   }
 
   void Init::serialReadTimer(){
-    auto available_bytes = this->serial_->available();
+    auto available_bytes = serial_.available();
     std::string str_received;
     if (available_bytes)
     {
-      this->serial_->read(str_received, available_bytes);
+      serial_.read(str_received, available_bytes);
       this->protocol_extraction_->AddNewData(str_received);
     }
   }
@@ -77,12 +85,11 @@ namespace linktrack
   void Init::initDataTransmission()
   {
     auto callback = [this](const std_msgs::msg::String::SharedPtr msg) -> void {
-    if (this->serial_)
-      this->serial_->write(msg->data);
+      serial_.write(msg->data);
     };
-    dt_sub_ =
-        create_subscription<std_msgs::msg::String>("nlink_linktrack_data_transmission", 1000, callback);
-  }
+      dt_sub_ =
+          create_subscription<std_msgs::msg::String>("nlink_linktrack_data_transmission", 1000, callback);
+    }
 
   void Init::initAnchorFrame0(NProtocolExtracter *protocol_extraction)
   {
